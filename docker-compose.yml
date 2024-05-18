@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MYSQL_HOST: mysql 
+      SQLALCHEMY_DATABASE_URI : mysql+pymysql://root:rootpassword@mysql/sampledb  # Update connection string
+      SECRET_KEY : 6969
+      JWT_SECRET_KEY : your_jwt_secret_key
+      ADMIN_SECRET_KEY : rastogi_6969
+      MAIL_SERVER : smtp.zoho.in
+      MAIL_PORT : 587
+      MAIL_USERNAME : relaynode@psyphi-dev.tech
+      MAIL_PASSWORD : Afnet@747
+      MAIL_DEFAULT_SENDER : relaynode@psyphi-dev.tech
+    volumes:
+      - .:/app
+    depends_on:
+        mysql:
+          condition: service_healthy
+    networks:
+      - mynetwork  
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: 'rootpassword'
+      MYSQL_DATABASE: sampledb  # Specify the database name here
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
+volumes:
+  mysql_data:
+
+networks:
+  mynetwork:
+    driver: bridge
